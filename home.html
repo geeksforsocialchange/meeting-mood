@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Meeting Mood</title>
+    <script type="text/javascript">
+        window.onload = function () {
+            var moods = {
+                "hard agree": {"votes": 0, selected: false},
+                "hard agree and volunteer": {"votes": 0, selected: false},
+            };
+            const moodelement = document.getElementById("moods")
+            for (const mood of Object.keys(moods)) {
+                const button = document.createElement("button");
+                button.id = mood
+                button.onclick = function() {
+                    if (!conn) {
+                        return false;
+                    }
+                    if (moods[button.id]['selected'] === true) {
+                        moods[button.id]['selected'] = false;
+                        button.style.backgroundColor='';
+                        conn.send(JSON.stringify({"mood": mood, "name": document.getElementById("name").value, "vote": -1}));
+                    } else {
+                        moods[button.id]['selected'] = true;
+                        button.style.backgroundColor='green';
+                        conn.send(JSON.stringify({"mood": mood, "name": document.getElementById("name").value, "vote": 1}));
+                    }
+                    return false;
+                }
+                button.innerText=`${mood} (${moods[mood]['votes']})`;
+                moodelement.appendChild(button);
+            }
+            var conn;
+            var log = document.getElementById("log");
+
+            function appendLog(item) {
+                var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
+                log.appendChild(item);
+                if (doScroll) {
+                    log.scrollTop = log.scrollHeight - log.clientHeight;
+                }
+            }
+
+            function updateVotes(name, value) {
+                moods[name]['votes'] = moods[name]['votes'] + value;
+                const button = document.getElementById(name);
+                button.innerText = `${name} (${moods[name]['votes']})`
+            }
+
+            if (window["WebSocket"]) {
+                conn = new WebSocket("ws://" + document.location.host + "/ws");
+                conn.onclose = function (evt) {
+                    var item = document.createElement("div");
+                    item.innerHTML = "<b>Connection closed.</b>";
+                    appendLog(item);
+                };
+                conn.onmessage = function (evt) {
+                    var messages = evt.data.split('\n');
+                    for (var i = 0; i < messages.length; i++) {
+                        console.log(JSON.parse(messages[i]))
+                        var message = JSON.parse(messages[i])
+                        var item = document.createElement("div");
+                        item.innerHTML = `<em>${message['name']}</em>: ${message['mood']}`;
+                        appendLog(item);
+                        updateVotes(message['mood'], message['vote']);
+                    }
+                };
+            } else {
+                var item = document.createElement("div");
+                item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
+                appendLog(item);
+            }
+        };
+    </script>
+    <style type="text/css">
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: gray;
+        }
+
+        #moods {
+
+        }
+
+        #log {
+            background: white;
+            margin: 0;
+            padding: 0.5em 0.5em 0.5em 0.5em;
+            top: 0.5em;
+            left: 0.5em;
+            right: 0.5em;
+            bottom: 3em;
+            overflow: auto;
+        }
+
+    </style>
+</head>
+<body>
+<div id="form">Name: <input type="text" about="foo" id="name"/></div>
+<div id="moods"></div>
+<div id="log"></div>
+</body>
+</html>
