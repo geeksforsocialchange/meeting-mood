@@ -18,10 +18,12 @@ type moodOperatorStruct struct {
 	Username string `json:"username"`
 	Mood string `json:"mood"`
 	Operation string `json:"operation"`
+	Room string `json:"string"`
 }
 
 var (
-	clients = make(map[*websocket.Conn]bool)
+	//clients = make(map[*websocket.Conn]bool)
+	clients = make(map[Client]bool)
 	broadcast = make(chan *moodOperatorStruct)
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -33,6 +35,11 @@ var (
 
 )
 
+type Client struct {
+	Room string
+	Client *websocket.Conn
+}
+
 type App struct {
 	Port string
 	Logf func(string, ...interface{})
@@ -40,6 +47,9 @@ type App struct {
 
 //go:embed index.html
 var index string
+
+//go:embed room.html
+var room string
 
 func main() {
 	flag.Parse()
@@ -52,11 +62,13 @@ func main() {
 	}
 
 	router := mux.NewRouter()
+	router.StrictSlash(true)
 	router.HandleFunc("/", rootHandler).Methods("GET")
-	router.HandleFunc("/mood", addMoodHandler).Methods("POST")
-	router.HandleFunc("/ws", wsHandler)
-	router.HandleFunc("/all", allHandler).Methods("GET")
-	router.HandleFunc("/delete", deleteMoodHandler).Methods("POST")
+	router.HandleFunc("/{room}", roomHandler).Methods("GET")
+	router.HandleFunc("/{room}/mood", addMoodHandler).Methods("POST")
+	router.HandleFunc("/{room}/ws", wsHandler)
+	router.HandleFunc("/{room}/all", allHandler).Methods("GET")
+	router.HandleFunc("/{room}/delete", deleteMoodHandler).Methods("POST")
 	go echo()
 
 	log.Printf("Now open http://localhost:%s", app.Port)
@@ -66,6 +78,12 @@ func main() {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.New("template").Parse(index))
+	footer, _ := ioutil.ReadFile("footer.html")
+	tmpl.Execute(w, string(footer))
+}
+
+func roomHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.New("template").Parse(room))
 	footer, _ := ioutil.ReadFile("footer.html")
 	tmpl.Execute(w, string(footer))
 }
@@ -81,10 +99,9 @@ func addMoodHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad request", http.StatusTeapot)
 		return
 	}
-	log.Println(mood)
 	Save(mood, db)
 	defer r.Body.Close()
-	go writer(&moodOperatorStruct{Username: mood.Username, Mood: mood.Mood, Operation: "Save"})
+	go writer(&moodOperatorStruct{Username: mood.Username, Mood: mood.Mood, Operation: "Save", Room: mood.Room})
 }
 
 func deleteMoodHandler(w http.ResponseWriter, r * http.Request) {
@@ -101,19 +118,21 @@ func deleteMoodHandler(w http.ResponseWriter, r * http.Request) {
 
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// register client
-	clients[ws] = true
+	clients[Client{Client: ws, Room: vars["room"]}] = true
 }
 
 func allHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	userMoods := GetAll(db)
+	userMoods := GetAll(vars["room"], db)
 	json.NewEncoder(w).Encode(userMoods)
 }
 
@@ -121,14 +140,17 @@ func echo() {
 	for {
 		val := <-broadcast
 		mood, _ := json.Marshal(val)
-		// send to every client that is currently connected
+		// @TODO there's probably a better way of only sending to clients in the current room
 		for client := range clients {
-			err := client.WriteMessage(websocket.TextMessage, mood)
-			if err != nil {
-				log.Printf("Websocket error: %s", err)
-				client.Close()
-				delete(clients, client)
+			if client.Room == val.Room {
+				err := client.Client.WriteMessage(websocket.TextMessage, mood)
+				if err != nil {
+					log.Printf("Websocket error: %s", err)
+					client.Client.Close()
+					delete(clients, client)
+				}
 			}
+
 		}
 	}
 }
