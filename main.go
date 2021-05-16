@@ -3,11 +3,14 @@ package main
 import (
 	_ "embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"log"
+	"net"
 	"net/http"
+	"os"
 )
 
 type moodOperatorStruct struct {
@@ -16,19 +19,37 @@ type moodOperatorStruct struct {
 	Operation string `json:"operation"`
 }
 
+var (
+	clients = make(map[*websocket.Conn]bool)
+	broadcast = make(chan *moodOperatorStruct)
+	upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	db = Database()
+	port = flag.String("port", "8844", "port to listen on")
 
-var clients = make(map[*websocket.Conn]bool)
-var broadcast = make(chan *moodOperatorStruct)
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+)
+
+type App struct {
+	Port string
+	Logf func(string, ...interface{})
 }
+
 //go:embed index.html
 var index string
-var db = Database()
 
 func main() {
+	flag.Parse()
+	app := App{
+		Port: *port,
+	}
+	port := os.Getenv("PORT")
+	if port != "" {
+		app.Port = port
+	}
+
 	router := mux.NewRouter()
 	router.HandleFunc("/", rootHandler).Methods("GET")
 	router.HandleFunc("/mood", addMoodHandler).Methods("POST")
@@ -37,8 +58,9 @@ func main() {
 	router.HandleFunc("/delete", deleteMoodHandler).Methods("POST")
 	go echo()
 
-	log.Println("Now open http://localhost:8844")
-	log.Fatal(http.ListenAndServe(":8844", router))
+	log.Printf("Now open http://localhost:%s", app.Port)
+	addr := net.JoinHostPort("", app.Port)
+	log.Fatal(http.ListenAndServe(addr, router))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {

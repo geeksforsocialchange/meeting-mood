@@ -4,13 +4,16 @@
 
 Consensus hand signals for online meetings
 
-Run it with `go run *.go` or execute one of the release binaries and then open http://localhost:8844
+If you are building from source run `go build` to get a binary file to run
+
+Then run it with `./meeting-mood` and open http://localhost:8844
+
+Specify the environment variable `PORT=8080` or pass the flag `--port 8080` to override the port number
 
 Put it on the internet and share the link with everybody in the meeting (use [Ngrok](https://ngrok.com/) and plain HTTP)
 
 ## Known Issues
 
-- Port is hardcoded
 - HTTPS through Ngrok doesn't work
 - Only a single meeting is supported
 - There is no authentication or authorisation
