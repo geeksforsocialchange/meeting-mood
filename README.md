@@ -4,9 +4,12 @@
 
 Consensus hand signals for online meetings
 
-If you are building from source run `go build` to get a binary file to run
+To install, either:
+* Download the appropriate binary from the [latest release](https://github.com/WheresAlice/meeting-mood/releases/latest)
+* Run `brew install wheresalice/meeting-mood/meeting-mood` to install via Homebrew
+* Clone this repo and run `go build`
 
-Then run it with `./meeting-mood` and open http://localhost:8844
+Then run it with `meeting-mood` and open http://localhost:8844
 
 Specify the environment variable `PORT=8080` or pass the flag `--port 8080` to override the port number
 
