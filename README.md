@@ -1,5 +1,7 @@
 # Meeting Mood
 
+![screenshot.png](screenshot.png)
+
 Consensus hand signals for online meetings
 
 Run it with `go run *.go` or execute one of the release binaries and then open http://localhost:8844
