@@ -6,12 +6,17 @@ Consensus hand signals for online meetings
 
 ## Installation:
 
-To install, either:
+This application needs to be run somewhere with a public IP so that people can connect to it.
+
+The easiest way of doing this is to deploy this repository as a Dokku app.  We presume that you can also push it as a Heroku app, but that is untested.
+
+There are a number of other ways you can get hold the binary to run:
+
 * Download the appropriate binary from the [latest release](https://github.com/WheresAlice/meeting-mood/releases/latest)
 * Run `brew install wheresalice/meeting-mood/meeting-mood` to install via Homebrew
 * Clone this repo and run `go build`
 
-Run the `meeting-mood` binary file somewhere that all your meeting joiners can connect to, which usually means somewhere with a public IP.  By default, it will listen on port 8844.
+If you are running the binary outside of Dokku/Heroku then it will listen on port 8844 by default.
 
 ## Configuration Options
 
