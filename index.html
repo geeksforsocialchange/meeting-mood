@@ -13,6 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <style>
         * {font-family: 'Fira Code', monospace;}
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            color: #6d6875;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +41,9 @@
 <div class="mood-list" data-bind="foreach: moods">
     <article class="mood" data-bind="click: $root.removeMood"><span data-bind="text: username"></span> :: <span
             data-bind="text: mood"></span></article>
+</div>
+<div class="footer">
+    <p>{{.}}</p>
 </div>
 <script type="application/javascript">
     try {

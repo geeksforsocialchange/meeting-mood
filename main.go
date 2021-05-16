@@ -4,13 +4,14 @@ import (
 	_ "embed"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"text/template"
 )
 
 type moodOperatorStruct struct {
@@ -64,7 +65,9 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, index)
+	tmpl := template.Must(template.New("template").Parse(index))
+	footer, _ := ioutil.ReadFile("footer.html")
+	tmpl.Execute(w, string(footer))
 }
 
 func writer(mood *moodOperatorStruct) {

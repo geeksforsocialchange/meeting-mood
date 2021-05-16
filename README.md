@@ -13,6 +13,8 @@ Then run it with `meeting-mood` and open http://localhost:8844
 
 Specify the environment variable `PORT=8080` or pass the flag `--port 8080` to override the port number
 
+Put a footer.html in your current directory and the contents will be displayed as a footer.
+
 Put it on the internet and share the link with everybody in the meeting (use [Ngrok](https://ngrok.com/) and plain HTTP)
 
 ## Known Issues
