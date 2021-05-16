@@ -6,7 +6,7 @@ Consensus hand signals for online meetings
 
 ## Installation:
 
-This application needs to be run somewhere with a public IP so that people can connect to it.
+This application needs to be run somewhere with a public IP so that people can connect to it.  There is a [development version](https://meeting-mood.wheresalice.info) running but it may break at any point.
 
 The easiest way of doing this is to deploy this repository as a Dokku app.  We presume that you can also push it as a Heroku app, but that is untested.
 
