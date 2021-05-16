@@ -23,3 +23,11 @@ Put it on the internet and share the link with everybody in the meeting (use [Ng
 - Hardcoded set of moods (for consensus decision making)
 - No sorting of moods
 - Not very mobile friendly
+
+## Donations
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/wheresalice)
+
+## License
+
+meeting-mood is released under the [MIT license](LICENSE).
