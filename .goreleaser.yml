@@ -29,8 +29,8 @@ changelog:
       - Merge pull request
 brews:
   - tap:
-      owner: wheresalice
+      owner: geeksforsocialchange
       name: homebrew-meeting-mood
     description: Web app to collect people's moods in a meeting
-    homepage: https://github.com/wheresalice/meeting-mood
+    homepage: https://github.com/geeksforsocialchange/meeting-mood
     license: MIT

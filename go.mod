@@ -1,4 +1,4 @@
-module github.com/WheresAlice/meeting-mood
+module github.com/geeksforsocialchange/meeting-mood
 
 go 1.16
 
