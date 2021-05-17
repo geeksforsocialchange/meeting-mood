@@ -33,15 +33,6 @@ You can optionally:
 4. Press buttons to make hand signals
 5. Press `x` to stop making a hand signal
 
-## Known Issues
-
-- HTTPS through Ngrok doesn't work
-- There is no authentication or authorisation
-- Hardcoded set of moods (for consensus decision making)
-- No sorting of moods
-- Not very mobile friendly
-- Probably not very performant in places
-
 ## Donations
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/wheresalice)
