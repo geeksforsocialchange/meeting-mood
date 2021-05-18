@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Consensus Hand Signals</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.js"
-            integrity="sha512-2AL/VEauKkZqQU9BHgnv48OhXcJPx9vdzxN1JrKDVc4FPU/MEE/BZ6d9l0mP7VmvLsjtYwqiYQpDskK9dG8KBA=="
-            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.js"
+            integrity="sha512-YXLGLsQBiwHPHLCAA9npZWhADUsHECjkZ71D1uzT2Hpop82/eLnmFb6b0jo8pK4T0Au0g2FETrRJNblF/46ZzQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"
             integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA=="
             crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <style>
-        * {font-family: 'Fira Code', monospace;}
+        * {
+            font-family: 'Fira Code', monospace;
+        }
+
         .footer {
             position: fixed;
             left: 0;
@@ -24,112 +27,108 @@
     </style>
 </head>
 <body>
-<p>Room number: <span id="roomnumber"></span></p>
-<div id="form">
-    <label for="username">Username:</label> <input type="text" name="username" id="username"> <span onclick="clearMe()">×</span>
-    <br>
-    <button onclick="sendMood('agree')">Agree</button>
-    <button onclick="sendMood('agree and volunteer')">Agree and volunteer</button>
-    <button onclick="sendMood('response')">Response</button>
-    <button onclick="sendMood('direct response')">Direct Response</button>
-    <button onclick="sendMood('technical point')">Technical Point</button>
-    <button onclick="sendMood('language')">Language</button>
-    <button onclick="sendMood('speak up')">Speak Up</button>
-    <button onclick="sendMood('slow down')">Slow Down</button>
-    <button onclick="sendMood('I\'m confused')">I'm Confused</button>
-    <button onclick="sendMood('veto')">Veto</button>
-</div>
-<div class="mood-list" data-bind="foreach: moods">
-    <article class="mood" data-bind="click: $root.removeMood"><span data-bind="text: username"></span> :: <span
-            data-bind="text: mood"></span></article>
+<div id="app">
+    <input v-model="user" placeholder="username"> <span v-on:click="deleteUserMood(user)">×</span>
+    <p>Room number: <span id="roomnumber">{{ room }}</span></p>
+    <button v-for="(mood, index) in moods" v-on:click="sendMood(mood)">{{ mood }}</button>
+    <div class="mood-list">
+        <article class="mood" v-for="(item, index) in userMoods" v-on:click="deleteUserMood(item.username)"><span
+                id="mooduser">{{item.username}}</span> :: <span id="mood">{{item.mood}}</span></article>
+    </div>
 </div>
 <div class="footer">
-    <p>{{.}}</p>
+    <p>[[.]]</p>
 </div>
-<script type="application/javascript">
-    try {
-        document.getElementById("username").value = document.cookie.split("; ").find(row => row.startsWith("username=")).split('=')[1]
-    } catch (e) {
-        console.log("New user")
-    }
-    const room = location.pathname.split("/")[1]
-    document.getElementById("roomnumber").innerText = room;
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            user: '',
+            room: undefined,
+            moods: [
+                "Agree",
+                "Agree and volunteer",
+                "Response",
+                "Direct response",
+                "Technical point",
+                "Language",
+                "Speak up",
+                "Slow down",
+                "I'm confused",
+                "Veto"
+            ],
+            userMoods: []
+        },
+        methods: {
+            deleteUserMood: function (username = this.user) {
+                const body = JSON.stringify({
+                    username: username,
+                    roomUser: `${this.room}${username}`
+                })
+                fetch(`/${this.room}/delete`, {
+                    method: 'post',
+                    body: body
+                })
+            },
+            sendMood: function (mood) {
+                // 2419200 is 28 days - the username cookie will expire if you don't use it for four weeks
+                document.cookie = `username=${this.user};max-age=2419200;SameSite=Strict`
+                const message = JSON.stringify({
+                    username: this.user,
+                    mood: mood,
+                    room: this.room,
+                    roomUser: `${this.room}${this.user}`
+                })
+                fetch(`/${this.room}/mood`, {
+                    method: 'post',
+                    body: message
+                })
+            },
+        }
+    })
 
-    const MoodViewModel = {
-        moods: ko.observableArray([])
-    }
-    MoodViewModel.removeMood = function () {
-        fetch(`${location.pathname}/delete`, {
-            method: "post",
-            body: JSON.stringify({username: this.username, mood: this.mood})
-        })
-        MoodViewModel.moods.remove(this);
-    }
-    ko.applyBindings(MoodViewModel);
+    window.onload = function () {
+        try {
+            app.user = document.cookie.split("; ").find(row => row.startsWith("username=")).split('=')[1]
+        } catch (e) {
+            console.log(e)
+            console.log("New user")
+        }
+        app.room = location.pathname.split("/")[1]
 
-    function resetMoods() {
-        MoodViewModel.moods.removeAll()
-        fetch(`${location.pathname}/all`)
-            .then(res => res.json())
-            .then((all) => {
-                if (all != null) {
-                    all.forEach(mood => {
-                        MoodViewModel.moods.push(mood)
+
+        const socketAddr = ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + window.location.pathname + "/ws"
+        const moodSocket = new ReconnectingWebSocket(socketAddr);
+        const update = function () {
+            moodSocket.onopen = function () {
+                console.log(`(re)-connected to ${socketAddr}`)
+                app.userMoods = []
+                fetch(`/${app.room}/all`)
+                    .then(res => res.json())
+                    .then((all) => {
+                        if (all != null) {
+                            all.forEach(mood => {
+                                app.userMoods.push(mood)
+                            })
+                        }
                     })
-                }
-            })
-    }
-
-    function clearMe() {
-        fetch(`${location.pathname}/delete`, {
-            method: 'post',
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                mood: "",
-            })
-        })
-    }
-
-    function sendMood(mood) {
-        const username = document.getElementById("username").value
-        document.cookie = `username=${username};SameSite=Strict`;
-        const message = JSON.stringify({
-            username: username,
-            mood: mood,
-            room: room,
-            roomUser: `${room}${username}`
-        })
-        fetch(`${location.pathname}/mood`, {
-            method: 'post',
-            body: message
-        })
-    }
-
-    const socketAddr =  ((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + window.location.pathname + "/ws"
-    const moodSocket = new ReconnectingWebSocket(socketAddr);
-    const update = function () {
-        moodSocket.onopen = function () {
-            console.log(`(re)-connected to ${socketAddr}`)
-            resetMoods()
-        }
-        moodSocket.onmessage = function (event) {
-            const moodOperation = JSON.parse(event.data)
-            const mood = {username: moodOperation.username, mood: moodOperation.mood}
-            switch (moodOperation.operation) {
-                case "Delete":
-                    MoodViewModel.moods.remove(function (item) {
-                        return item.username === mood.username
-                    });
-                    break;
-                case "Save":
-                    MoodViewModel.moods.remove(function (item) {
-                        return item.username === mood.username
-                    });
-                    MoodViewModel.moods.push(mood)
             }
-        }
-    };
-    window.setTimeout(update);
+            moodSocket.onmessage = function (event) {
+                const moodOperation = JSON.parse(event.data)
+                const mood = {username: moodOperation.username, mood: moodOperation.mood}
+                switch (moodOperation.operation) {
+                    case "Delete":
+                        // delete
+                        app.userMoods = app.userMoods.filter(item => item.username != mood.username)
+                        break;
+                    case "Save":
+                        app.userMoods = app.userMoods.filter(item => item.username != mood.username)
+                        app.userMoods.push(mood)
+                }
+            }
+        };
+        window.setTimeout(update);
+    }
 </script>
 </body>
 </html>

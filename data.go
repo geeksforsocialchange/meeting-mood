@@ -9,7 +9,7 @@ type UserMoodStruct struct {
 	RoomUser string `json:"roomUser"`
 	Username string `json:"username"`
 	Mood     string `json:"mood"`
-	Room	 string `json:"room"`
+	Room     string `json:"room"`
 }
 
 func Database() *memdb.MemDB {
@@ -24,8 +24,8 @@ func Database() *memdb.MemDB {
 						Indexer: &memdb.StringFieldIndex{Field: "RoomUser"},
 					},
 					"username": {
-						Name: "username",
-						Unique: false,
+						Name:    "username",
+						Unique:  false,
 						Indexer: &memdb.StringFieldIndex{Field: "Username"},
 					},
 					"mood": {
@@ -34,8 +34,8 @@ func Database() *memdb.MemDB {
 						Indexer: &memdb.StringFieldIndex{Field: "Mood"},
 					},
 					"room": {
-						Name: "room",
-						Unique: false,
+						Name:    "room",
+						Unique:  false,
 						Indexer: &memdb.StringFieldIndex{Field: "Room"},
 					},
 				},
@@ -51,13 +51,14 @@ func Database() *memdb.MemDB {
 }
 
 func Save(moodStruct UserMoodStruct, db *memdb.MemDB) {
+	log.Println("Saving userMood:", moodStruct)
 	txn := db.Txn(true)
 	txn.Insert("usermood", moodStruct)
 	txn.Commit()
 }
 
 func Delete(roomuser string, db *memdb.MemDB) {
-	log.Println(roomuser)
+	log.Println("Deleting roomUser:", roomuser)
 	txn := db.Txn(true)
 	_, err := txn.DeleteAll("usermood", "id", roomuser)
 	if err != nil {
@@ -67,6 +68,7 @@ func Delete(roomuser string, db *memdb.MemDB) {
 }
 
 func GetAll(room string, db *memdb.MemDB) []UserMoodStruct {
+	log.Println("Returning all moods for room", room)
 	txn := db.Txn(false)
 	defer txn.Abort()
 

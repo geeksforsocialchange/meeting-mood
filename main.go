@@ -15,28 +15,27 @@ import (
 )
 
 type moodOperatorStruct struct {
-	Username string `json:"username"`
-	Mood string `json:"mood"`
+	Username  string `json:"username"`
+	Mood      string `json:"mood"`
 	Operation string `json:"operation"`
-	Room string `json:"string"`
+	Room      string `json:"string"`
 }
 
 var (
 	//clients = make(map[*websocket.Conn]bool)
-	clients = make(map[Client]bool)
+	clients   = make(map[Client]bool)
 	broadcast = make(chan *moodOperatorStruct)
-	upgrader = websocket.Upgrader{
+	upgrader  = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
 	}
-	db = Database()
+	db   = Database()
 	port = flag.String("port", "8844", "port to listen on")
-
 )
 
 type Client struct {
-	Room string
+	Room   string
 	Client *websocket.Conn
 }
 
@@ -77,13 +76,13 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.New("template").Parse(index))
+	tmpl := template.Must(template.New("template").Delims("[[", "]]").Parse(index))
 	footer, _ := ioutil.ReadFile("footer.html")
 	tmpl.Execute(w, string(footer))
 }
 
 func roomHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.New("template").Parse(room))
+	tmpl := template.Must(template.New("template").Delims("[[", "]]").Parse(room))
 	footer, _ := ioutil.ReadFile("footer.html")
 	tmpl.Execute(w, string(footer))
 }
@@ -104,18 +103,18 @@ func addMoodHandler(w http.ResponseWriter, r *http.Request) {
 	go writer(&moodOperatorStruct{Username: mood.Username, Mood: mood.Mood, Operation: "Save", Room: mood.Room})
 }
 
-func deleteMoodHandler(w http.ResponseWriter, r * http.Request) {
+func deleteMoodHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	var mood UserMoodStruct
 	if err := json.NewDecoder(r.Body).Decode(&mood); err != nil {
 		log.Printf("ERROR: %s", err)
 		http.Error(w, "Bad request", http.StatusTeapot)
 		return
 	}
-	Delete(mood.Username, db)
+	Delete(mood.RoomUser, db)
 	defer r.Body.Close()
-	go writer(&moodOperatorStruct{Username: mood.Username, Mood: mood.Mood, Operation: "Delete"})
+	go writer(&moodOperatorStruct{Username: mood.Username, Mood: mood.Mood, Operation: "Delete", Room: vars["room"]})
 }
-
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

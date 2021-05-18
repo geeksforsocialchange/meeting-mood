@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <title>Meeting Moods</title>
     <style>
-        * {font-family: 'Fira Code', monospace;}
+        * {
+            font-family: 'Fira Code', monospace;
+        }
+
         .footer {
             position: fixed;
             left: 0;
@@ -18,6 +21,7 @@
             height: 100%;
             display: grid;
         }
+
         button { /* thing to center */
             margin: auto;
         }
@@ -27,7 +31,7 @@
 <p>Distributed consensus hand signals</p>
 <button onclick="createRoom()">Create Room</button>
 <div class="footer">
-    <p>{{.}}</p>
+    <p>[[.]]</p>
 </div>
 <script>
     function createRoom() {
