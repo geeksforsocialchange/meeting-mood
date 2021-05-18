@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  meetingmood:
+    build: .
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "8800:8800"
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - $PWD:/srv
+    depends_on:
+      - meetingmood

@@ -1,0 +1,25 @@
+:8800
+
+@room {
+	path_regexp room ^/[0-9]+$
+}
+
+@root {
+	path root /
+}
+
+route @room {
+	rewrite * /room.html
+	file_server {
+		root /srv
+	}
+}
+
+route @root {
+	rewrite * /index.html
+	file_server {
+		root /srv
+	}
+}
+
+reverse_proxy meetingmood:8844

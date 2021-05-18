@@ -33,6 +33,12 @@ You can optionally:
 4. Press buttons to make hand signals
 5. Press `x` to stop making a hand signal
 
+## Development
+
+For purely-frontend development we provide a handy docker-compose environment which will let you make changes to the html without needing Go.
+
+Running `docker-compose up` will launch a Caddy proxy listening on http://localhost:8800/ as well as building and launching the checked-out Go code.  You can then make changes to the html pages and refresh the browser without needing to rebuild any of the backend components.
+
 ## Donations
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/wheresalice)
