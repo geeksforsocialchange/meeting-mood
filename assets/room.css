@@ -14,3 +14,16 @@ button
 {
     margin:5px;
 }
+
+.Agree_and_volunteer {
+    color: #2dc937
+}
+.Agree {
+    color: #99c140
+}
+.Stand_aside {
+    color: #e7b416
+}
+.Veto {
+    color: #cc3232
+}

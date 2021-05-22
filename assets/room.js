@@ -5,10 +5,10 @@ const app = new Vue({
         room: undefined,
         moods: {
             "Consent": [
-                "Agree",
                 "Agree and volunteer",
-                "Veto",
+                "Agree",
                 "Stand aside",
+                "Veto",
             ],
             "Requests": [
                 "Language",
