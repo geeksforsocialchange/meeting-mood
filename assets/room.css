@@ -1,0 +1,16 @@
+* {
+    font-family: 'Fira Code', monospace;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: #6d6875;
+    text-align: center;
+}
+button
+{
+    margin:5px;
+}

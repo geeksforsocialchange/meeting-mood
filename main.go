@@ -1,11 +1,12 @@
 package main
 
 import (
-	_ "embed"
+	"embed"
 	"encoding/json"
 	"flag"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net"
@@ -22,7 +23,6 @@ type moodOperatorStruct struct {
 }
 
 var (
-	//clients = make(map[*websocket.Conn]bool)
 	clients   = make(map[Client]bool)
 	broadcast = make(chan *moodOperatorStruct)
 	upgrader  = websocket.Upgrader{
@@ -50,6 +50,9 @@ var index string
 //go:embed room.html
 var room string
 
+//go:embed assets/*
+var assets embed.FS
+
 func main() {
 	flag.Parse()
 	app := App{
@@ -68,11 +71,19 @@ func main() {
 	router.HandleFunc("/{room:[0-9]+}/ws", wsHandler)
 	router.HandleFunc("/{room:[0-9]+}/all", allHandler).Methods("GET")
 	router.HandleFunc("/{room:[0-9]+}/delete", deleteMoodHandler).Methods("POST")
+
+	router.PathPrefix("/assets/").Handler(assetsHandler())
 	go echo()
 
 	log.Printf("Now open http://localhost:%s", app.Port)
 	addr := net.JoinHostPort("", app.Port)
 	log.Fatal(http.ListenAndServe(addr, router))
+}
+
+func assetsHandler() http.Handler {
+	fsys := fs.FS(assets)
+	contentStatic, _ := fs.Sub(fsys, "assets")
+	return http.StripPrefix("/assets/", http.FileServer(http.FS(contentStatic)))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {

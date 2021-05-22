@@ -37,7 +37,7 @@ You can optionally:
 
 For purely-frontend development we provide a handy docker-compose environment which will let you make changes to the html without needing Go.
 
-Running `docker-compose up` will launch a Caddy proxy listening on http://localhost:8800/ as well as building and launching the checked-out Go code.  You can then make changes to the html pages and refresh the browser without needing to rebuild any of the backend components.
+Running `docker-compose up` will launch a Caddy proxy listening on http://localhost:8800/ as well as building and launching the checked-out Go code.  You can then make changes to index.html, room.html, and anything in the assets directory and refresh the browser without needing to rebuild any of the backend components.
 
 ## Donations
 

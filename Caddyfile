@@ -8,6 +8,10 @@
 	path root /
 }
 
+@assets {
+    path assets /assets/*
+}
+
 route @room {
 	rewrite * /room.html
 	file_server {
@@ -20,6 +24,12 @@ route @root {
 	file_server {
 		root /srv
 	}
+}
+
+route @assets {
+    file_server {
+        root /srv
+    }
 }
 
 reverse_proxy meetingmood:8844
