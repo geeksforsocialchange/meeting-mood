@@ -17,6 +17,11 @@ const app = new Vue({
         ],
         userMoods: []
     },
+    computed: {
+        isReady: function () {
+            return this.user.length > 0
+        }
+    },
     methods: {
         deleteUserMood: function (username = this.user) {
             const body = JSON.stringify({

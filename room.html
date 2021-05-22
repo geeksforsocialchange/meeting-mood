@@ -17,7 +17,7 @@
 <div id="app">
     <input v-model="user" placeholder="username"> <span v-on:click="deleteUserMood(user)">×</span>
     <p>Room number: <span id="roomnumber">{{ room }}</span></p>
-    <button v-for="(mood, index) in moods" v-on:click="sendMood(mood)">{{ mood }}</button>
+    <button v-for="(mood, index) in moods" v-on:click="sendMood(mood)" v-bind:disabled="!isReady">{{ mood }}</button>
     <div class="mood-list">
         <article class="mood" v-for="(item, index) in userMoods" v-on:click="deleteUserMood(item.username)"><span
                 id="mooduser">{{item.username}}</span> :: <span id="mood">{{item.mood}}</span></article>
