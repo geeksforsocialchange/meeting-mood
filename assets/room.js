@@ -3,18 +3,26 @@ const app = new Vue({
     data: {
         user: '',
         room: undefined,
-        moods: [
-            "Agree",
-            "Agree and volunteer",
-            "Response",
-            "Direct response",
-            "Technical point",
-            "Language",
-            "Speak up",
-            "Slow down",
-            "I'm confused",
-            "Veto"
-        ],
+        moods: {
+            "Consent": [
+                "Agree",
+                "Agree and volunteer",
+                "Veto",
+                "Stand aside",
+            ],
+            "Requests": [
+                "Language",
+                "Speak up",
+                "Slow down",
+                "I'm confused",
+
+            ],
+            "Responses": [
+                "Response",
+                "Direct response",
+                "Technical point",
+            ]
+        },
         userMoods: []
     },
     computed: {

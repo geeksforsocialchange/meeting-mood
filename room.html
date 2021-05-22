@@ -17,10 +17,14 @@
 <div id="app">
     <input v-model="user" placeholder="username"> <span v-on:click="deleteUserMood(user)">×</span>
     <p>Room number: <span id="roomnumber">{{ room }}</span></p>
-    <button v-for="(mood, index) in moods" v-on:click="sendMood(mood)" v-bind:disabled="!isReady">{{ mood }}</button>
+    <div v-for="(value, key) in moods" class="moodgroup">
+        {{key}}:
+        <button v-for="(mood, index) in moods[key]" v-on:click="sendMood(mood)" v-bind:disabled="!isReady" class="mood-button">{{ mood }}</button>
+    </div>
+    <hr>
     <div class="mood-list">
         <article class="mood" v-for="(item, index) in userMoods" v-on:click="deleteUserMood(item.username)"><span
-                id="mooduser">{{item.username}}</span> :: <span id="mood">{{item.mood}}</span></article>
+                class="mood__username">{{item.username}}</span> :: <span class="mood__mood">{{item.mood}}</span></article>
     </div>
 </div>
 <div class="footer">
