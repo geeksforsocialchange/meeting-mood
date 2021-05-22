@@ -1,0 +1,87 @@
+openapi: 3.0.1
+info:
+  description: APIs provided for a single room in the [meeting-mood](https://github.com/geeksforsocialchange/meeting-mood) application.  These APIs are how the frontend interacts with the backend, and are documented here to help with testing.
+  version: 0.3.0
+  title: meeting-mood
+paths:
+  '/all':
+    get:
+      summary: 'list all user moods from the room'
+      responses:
+        '200':
+          description: a list of users and moods for the room
+          content:
+            application/json:
+              examples:
+                list:
+                  value: >-
+                    [{"roomUser":"123Bob","username":"Bob","mood":"Agree","room":"123"}]
+        default:
+          description: When no room moods exist
+          content:
+            text/plain; charset=utf-8:
+              examples:
+                none:
+                  value: |
+                    null
+  '/mood':
+    post:
+      summary: submit a user's mood to the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "Alice"
+                mood:
+                  type: string
+                  enum: ["Agree","Agree and volunteer","Veto","Stand aside","Language","Speak up","Slow down","I'm confused", "Response","Direct response","Technical point",]
+                room:
+                  type: string
+                  example: '12345'
+                roomUser:
+                  type: string
+                  example: '12345Alice'
+      responses:
+        '200':
+          description: successfully posted
+        '418':
+          description: JSON parsing failed
+  '/delete':
+    post:
+      summary: delete a user's mood from the room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "Alice"
+                roomUser:
+                  type: string
+                  example: '12345Alice'
+      responses:
+        '200':
+          description: successfully deleted
+        '418':
+          description: JSON parsing failed
+  '/ws':
+    summary: a websocket streaming updates for the room
+    get:
+      summary: 'subscribe to the websocket'
+      responses:
+        '200':
+          description: subscribe to the websocket
+servers:
+  - url: '/{room}'
+    variables:
+      room:
+        default: '12345'
+        description: room number
