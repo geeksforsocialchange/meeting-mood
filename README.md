@@ -1,5 +1,11 @@
 # Meeting Mood
 
+[![Release](https://img.shields.io/github/release-pre/geeksforsocialchange/meeting-mood.svg?logo=github&style=flat&v=1)](https://github.com/geeksforsocialchange/meeting-mood/releases)
+[![Build Status](https://img.shields.io/github/workflow/status/geeksforsocialchange/meeting-mood/run-go-tests?logo=github&v=1)](https://github.com/geeksforsocialchange/meeting-mood/actions)
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/geeksforsocialchange/meeting-mood&style=flat&v=1)](https://mergify.io)
+[![Go](https://img.shields.io/github/go-mod/go-version/geeksforsocialchange/meeting-mood?v=1)](https://golang.org/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/geeksforsocialchange/meeting-mood)
+
 ![screenshot.png](screenshot.png)
 
 Consensus hand signals for online meetings
