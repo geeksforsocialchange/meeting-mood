@@ -20,3 +20,13 @@ updates:
     labels:
       - "chore"
     open-pull-requests-limit: 10
+
+  # Manage docker image versions.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: "friday"
+    labels:
+      - "chore"
+    open-pull-requests-limit: 10
