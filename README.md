@@ -19,7 +19,6 @@ The easiest way of doing this is to deploy this repository as a Dokku app.  We p
 There are a number of other ways you can get hold the binary to run:
 
 * Download the appropriate binary from the [latest release](https://github.com/geeksforsocialchange/meeting-mood/releases/latest)
-* Run `brew install geeksforsocialchange/meeting-mood/meeting-mood` to install via Homebrew
 * Clone this repo and run `go build`
 
 If you are running the binary outside of Dokku/Heroku then it will listen on port 8844 by default.
