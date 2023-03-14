@@ -9,6 +9,7 @@ pull_request_rules:
       - -draft
       - author~=^dependabot(|-preview)\[bot\]$
       - check-success='test (1.20.x, ubuntu-latest)'
+      - check-success='docker'
       - title~=bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
       review:
@@ -20,6 +21,7 @@ pull_request_rules:
     conditions:
       - author~=^dependabot(|-preview)\[bot\]$
       - check-success='test (1.20.x, ubuntu-latest)'
+      - check-success='docker'
       - -title~=bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
       comment:
@@ -33,6 +35,7 @@ pull_request_rules:
     conditions:
       - "#approved-reviews-by>=1"
       - check-success='test (1.20.x, ubuntu-latest)'
+      - check-success='docker'
       - label!=work-in-progress
       - -draft
     actions:
