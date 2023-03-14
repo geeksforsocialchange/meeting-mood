@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - "*"
-  push:
-    branches:
-      - "*"
 jobs:
   test:
     strategy:
@@ -37,3 +34,11 @@ jobs:
             ${{ runner.os }}-go-
       - name: Run linter and tests
         run: go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker build
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          tags: gfsc/meeting-mood:latest
